@@ -1,0 +1,37 @@
+import os
+import sys
+from dotenv import load_dotenv
+load_dotenv()
+sys.stderr = open(os.devnull, 'w')
+from langchain_groq import ChatGroq
+import streamlit as st
+# Initialize using the modern SDK setup matching your packages
+llm = ChatGroq(
+    model="openai/gpt-oss-20b "
+)
+st.title("Ask me anything buddy?")
+st.markdown("My QNA bot with langchain and google gemini")
+if "messages" not in st.session_state:
+      st.session_state.messages = []
+que =st.chat_input( "Ask anything")
+for message in st.session_state.messages:
+       role = message["role"]
+       content= message["content"]
+       st.chat_message(role).markdown(content)
+
+if que:
+      
+       st.session_state.messages.append({"role":"user","content":que})
+       st.chat_message("user").markdown(que)
+       result = llm.invoke(st.session_state.messages)
+       st.chat_message("ai").markdown(result.content)
+       st.session_state.messages.append({"role":"assistant","content":result.content})
+#while True :
+  #   que = input("USER:  ")
+    # if que.lower() in {"quit","exit","bye"}:
+    #     print("Goodbye")
+     #    break
+    # result = llm.invoke(que)
+    # sys.stderr = sys.__stderr__
+# CRITICAL: This line forces the terminal to print out the final answer
+    # print(result.text)
